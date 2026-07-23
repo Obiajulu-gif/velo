@@ -1,22 +1,19 @@
+export {
+  normalizeSettlementAsset,
+  selectEscrowDeployment,
+  supportedSettlementAssets,
+} from "./escrow-registry.js";
+export type {
+  EscrowDeployment,
+  EscrowDeploymentStatus,
+  VeloNetwork,
+} from "./escrow-registry.js";
+
+import type { EscrowDeployment, VeloNetwork } from "./escrow-registry.js";
+
 /**
- * Single source of truth for deployed contract addresses.
- * apps/api, mobile/backend, and mobile/frontend all import from here —
- * never hardcode a contract address in app code.
- *
- * Stellar Mainnet USDC issuer:
- *   GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN (Circle)
- *
- * USDC on Stellar is a classic asset (not a Soroban token) unless wrapped.
- * For Soroban contracts the token address is the Stellar Asset Contract (SAC)
- * address, which is deterministic:  https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md
- *
- * The SAC address for USDC on mainnet is:
- *   CCW67TSZV3SSWZ6NAU4B46GSAV4IX3ODU6OVU5Q2ZWCEO6PJ6W7JXK2O
- * (derived from the USDC classic asset descriptor via the SAC factory).
- *
- * ⚠️ Placeholder values below — replace with real deployed contract IDs
- *    AFTER the mainnet deployment transaction succeeds (step 4 of the
- *    go-live checklist in docs/mainnet-deployment.md).
+ * Legacy single-address constants retained for compatibility. New API code
+ * should route through ESCROW_DEPLOYMENTS plus environment registry entries.
  */
 export const CONTRACTS = {
   testnet: {
@@ -30,6 +27,25 @@ export const CONTRACTS = {
     zkVerifierRegistry: "",
   },
 } as const;
+
+/**
+ * Repository-managed escrow instances. Deployments added through
+ * ESCROW_CONTRACT_REGISTRY_JSON are merged with these at API startup, allowing
+ * a new token or patched contract to be activated without a code deployment.
+ */
+export const ESCROW_DEPLOYMENTS: Record<VeloNetwork, readonly EscrowDeployment[]> = {
+  testnet: [
+    {
+      deploymentId: "testnet-usdc-v1",
+      network: "testnet",
+      settlementAsset: "USDC",
+      version: 1,
+      contractId: CONTRACTS.testnet.escrow,
+      status: "active",
+    },
+  ],
+  mainnet: [],
+};
 
 /** Stellar Mainnet USDC metadata */
 export const USDC_MAINNET = {

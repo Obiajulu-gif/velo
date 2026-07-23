@@ -1,13 +1,11 @@
-/**
- * In-memory store for pending/settled cash requests.
- *
- * TODO (production): replace with a real database. This resets on every
- * server restart and does not scale past a single process — it exists
- * only to prove the lock -> release flow end-to-end over HTTP.
- */
 export interface CashRequestRecord {
     id: string; // trade id, hex
+    /** Immutable routing key for this trade. Never replace it during migrations. */
     contractId: string;
+    /** Registry metadata captured when the trade was created. Optional for legacy records. */
+    escrowDeploymentId?: string;
+    settlementAsset?: string;
+    contractVersion?: number;
     seller: string;
     buyer: string;
     amountStroops: string; // bigint as string, JSON-safe
@@ -48,7 +46,7 @@ export interface ProviderRecord {
     ipAddress?: string;
     deviceId?: string;
     createdAt: string;
-    // Opt-in payout batching (see docs/provider-payout-batching.md).
+    // Opt-in payout batching (see POST /provider/payout-settings).
     // Default "immediate" preserves today's per-trade release() behavior.
     payoutMode?: "immediate" | "batched";
 }
