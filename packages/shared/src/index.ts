@@ -47,3 +47,16 @@ export interface CashRequest {
   qr_payload: string;
   status: "pending" | "locked" | "released" | "refunded";
 }
+
+export {
+  bindTradeToEscrowContract,
+  getEscrowContractRegistry,
+  resolveEscrowContract,
+  resolveEscrowContractForTrade,
+} from "./contract-registry.js";
+export type {
+  ContractNetwork,
+  EscrowContractDeployment,
+  EscrowTradeBinding,
+  SettlementAsset,
+} from "./contract-registry.js";
